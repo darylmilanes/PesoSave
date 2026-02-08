@@ -3,17 +3,17 @@
 <head>
   <meta charset="UTF-8" />
   <title>PesoSave – Savings Weeks Tracker</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
 
   <!-- Theme color for browser UI / status bar -->
   <meta name="theme-color" content="#2563eb" />
 
-  <!-- Favicon & app icons (uses favicon.png for everything) -->
-  <link rel="icon" type="image/png" sizes="192x192" href="/favicon.png" />
-  <link rel="apple-touch-icon" href="/favicon.png" />
+  <!-- Favicon & app icons (uses relative paths) -->
+  <link rel="icon" type="image/png" sizes="192x192" href="favicon.png" />
+  <link rel="apple-touch-icon" href="favicon.png" />
 
   <!-- PWA Manifest -->
-  <link rel="manifest" href="/manifest.webmanifest" />
+  <link rel="manifest" href="manifest.webmanifest" />
 
   <style>
     :root {
@@ -29,6 +29,7 @@
     * {
       box-sizing: border-box;
       font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      -webkit-tap-highlight-color: transparent;
     }
 
     body {
@@ -41,6 +42,7 @@
       max-width: 480px;
       margin: 0 auto;
       padding: 1rem;
+      padding-bottom: 5rem; /* Extra space for install button */
     }
 
     h1 {
@@ -49,7 +51,7 @@
       display: flex;
       align-items: center;
       gap: 0.4rem;
-      color: var(--primary); /* brand name in primary blue */
+      color: var(--primary);
     }
 
     .brand-tagline {
@@ -100,11 +102,12 @@
       font-size: 1rem;
       font-weight: 600;
       cursor: pointer;
+      transition: transform 0.1s;
     }
 
     button:active {
       opacity: 0.9;
-      transform: translateY(1px);
+      transform: scale(0.98);
     }
 
     /* Icon-only settings button */
@@ -113,7 +116,7 @@
       background: transparent;
       color: var(--primary);
       border: none;
-      padding: 0.25rem;
+      padding: 0.5rem;
       font-size: 0.85rem;
       border-radius: 999px;
       display: inline-flex;
@@ -123,15 +126,11 @@
       cursor: pointer;
     }
 
-    .btn-ghost:active {
-      transform: none;
-    }
-
     .icon-settings {
-      width: 18px;
-      height: 18px;
+      width: 20px;
+      height: 20px;
       stroke: currentColor;
-      stroke-width: 1.8;
+      stroke-width: 2;
       fill: none;
     }
 
@@ -189,7 +188,7 @@
     }
 
     .hidden {
-      display: none;
+      display: none !important;
     }
 
     .pill {
@@ -209,7 +208,27 @@
       color: var(--danger);
     }
 
-    /* Modal backdrop + content for Settings */
+    /* Install Prompt UI */
+    .install-banner {
+      background: #1e293b;
+      color: white;
+      padding: 1rem;
+      border-radius: 0.75rem;
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    }
+
+    .install-btn {
+      background: var(--primary);
+      width: auto;
+      padding: 0.4rem 1rem;
+      font-size: 0.9rem;
+    }
+
+    /* Modal */
     .modal-backdrop {
       position: fixed;
       inset: 0;
@@ -231,16 +250,14 @@
     .modal {
       background: #ffffff;
       border-radius: 0.9rem;
-      padding: 1rem 1rem 1rem;
-      width: 100%;
+      padding: 1rem;
+      width: 90%;
       max-width: 420px;
       box-shadow: 0 10px 25px rgba(0, 0, 0, 0.25);
       transform: translateY(10px) scale(0.97);
       opacity: 0;
       border: none;
-      transition:
-        transform 0.35s ease,
-        opacity 0.35s ease;
+      transition: transform 0.35s ease, opacity 0.35s ease;
     }
 
     .modal-backdrop.open .modal {
@@ -272,17 +289,11 @@
       cursor: pointer;
     }
 
-    .modal-close-btn:active {
-      transform: none;
-      opacity: 0.7;
-    }
-
-    /* Toast (in-app notification) */
     .toast {
       position: fixed;
-      bottom: 1rem;
+      bottom: 2rem;
       left: 50%;
-      transform: translate(-50%, 10px);
+      transform: translate(-50%, 20px);
       background: #111827;
       color: #f9fafb;
       padding: 0.6rem 1rem;
@@ -290,11 +301,12 @@
       font-size: 0.85rem;
       box-shadow: 0 4px 10px rgba(0, 0, 0, 0.25);
       opacity: 0;
-      transition: opacity 0.25s ease, transform 0.25s ease;
+      transition: all 0.25s ease;
       z-index: 50;
       pointer-events: none;
       max-width: 90%;
       text-align: center;
+      width: max-content;
     }
 
     .toast.show {
@@ -309,7 +321,7 @@
       <div>
         <h1>PesoSave</h1>
         <p class="brand-tagline">
-          Track your peso savings in <strong>weeks of runway</strong>.
+          Track your peso savings runway.
         </p>
       </div>
       <button
@@ -317,12 +329,7 @@
         class="btn-ghost"
         aria-label="Open configuration"
       >
-        <!-- Modern sliders icon -->
-        <svg
-          class="icon-settings"
-          viewBox="0 0 24 24"
-          aria-hidden="true"
-        >
+        <svg class="icon-settings" viewBox="0 0 24 24" aria-hidden="true">
           <line x1="4" y1="7" x2="20" y2="7" />
           <circle cx="10" cy="7" r="2" />
           <line x1="4" y1="12" x2="20" y2="12" />
@@ -331,6 +338,14 @@
           <circle cx="8" cy="17" r="2" />
         </svg>
       </button>
+    </div>
+
+    <!-- INSTALL PROMPT (Hidden by default) -->
+    <div id="installContainer" class="hidden">
+      <div class="install-banner">
+        <span>Install PesoSave for easier access?</span>
+        <button id="installBtn" class="install-btn">Install</button>
+      </div>
     </div>
 
     <div id="loadingBanner" class="loading-banner">
@@ -346,8 +361,8 @@
           <strong id="totalSavedDisplay">₱0</strong>
         </div>
         <div class="stat">
-          <small>Weeks of Runway</small>
-          <strong id="weeksDisplay">0</strong>
+          <small>Runway</small>
+          <strong id="weeksDisplay">0 wks</strong>
         </div>
       </div>
       <p style="font-size:0.85rem; margin-top:0.75rem;">
@@ -360,11 +375,7 @@
 
     <!-- Add Savings -->
     <div class="card">
-      <h2 style="font-size:1rem; margin-top:0;">Add Savings / Deductions</h2>
-      <p style="font-size:0.8rem; margin-top:0; margin-bottom:0.5rem;">
-        You can enter negative values for deductions (e.g. <strong>-200</strong> for withdrawing money).
-      </p>
-
+      <h2 style="font-size:1rem; margin-top:0;">Add Entry</h2>
       <label for="amount">Amount (₱)</label>
       <input
         type="number"
@@ -374,7 +385,7 @@
       />
 
       <label for="note">Note <small>(optional)</small></label>
-      <input type="text" id="note" placeholder="e.g. salary, bonus, withdrawal" />
+      <input type="text" id="note" placeholder="e.g. Salary, Withdrawal" />
 
       <button id="addSavingBtn">Add Entry</button>
     </div>
@@ -383,7 +394,7 @@
     <div class="card">
       <div class="header-row">
         <h2 style="font-size:1rem; margin-top:0;">History</h2>
-        <span class="pill">Latest entries</span>
+        <span class="pill">Latest</span>
       </div>
       <div id="history"></div>
     </div>
@@ -404,14 +415,14 @@
         </button>
       </div>
       <p style="font-size:0.85rem; margin-top:0; margin-bottom:0.75rem;">
-        Set your <strong>weekly expense</strong> and <strong>emergency fund goal</strong>.
+        Set your <strong>weekly expense</strong> and <strong>goal</strong>.
       </p>
 
       <label for="weeklyExpense">Weekly Expense (₱)</label>
       <input type="number" id="weeklyExpense" placeholder="e.g. 1000" min="0" />
 
       <label for="goalAmount">
-        Emergency Fund Goal (₱) <small>(optional)</small>
+        Emergency Fund Goal (₱)
       </label>
       <input type="number" id="goalAmount" placeholder="e.g. 20000" min="0" />
 
@@ -419,10 +430,10 @@
     </div>
   </div>
 
-  <!-- In-app toast notification -->
+  <!-- Toast -->
   <div id="toast" class="toast"></div>
 
-  <!-- Firebase + App Logic -->
+  <!-- Firebase Logic -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
     import {
@@ -461,36 +472,58 @@
     let settings = { weeklyExpense: 0, goalAmount: 0 };
     let unsubscribeEntries = null;
     let toastTimeoutId = null;
-    let currentEntries = [];
 
+    // --- DOM Elements ---
     const weeklyExpenseInput = document.getElementById("weeklyExpense");
     const goalAmountInput = document.getElementById("goalAmount");
     const saveSettingsBtn = document.getElementById("saveSettingsBtn");
-
     const totalSavedDisplay = document.getElementById("totalSavedDisplay");
     const weeksDisplay = document.getElementById("weeksDisplay");
     const goalDisplay = document.getElementById("goalDisplay");
     const progressDisplay = document.getElementById("progressDisplay");
-
     const amountInput = document.getElementById("amount");
     const noteInput = document.getElementById("note");
     const addSavingBtn = document.getElementById("addSavingBtn");
     const historyDiv = document.getElementById("history");
-
     const toggleSettingsBtn = document.getElementById("toggleSettingsBtn");
     const settingsModal = document.getElementById("settingsModal");
     const closeSettingsBtn = document.getElementById("closeSettingsBtn");
-
     const loadingBanner = document.getElementById("loadingBanner");
     const toast = document.getElementById("toast");
+    const installContainer = document.getElementById("installContainer");
+    const installBtn = document.getElementById("installBtn");
 
+    // --- PWA Install Logic ---
+    let deferredPrompt;
+
+    window.addEventListener('beforeinstallprompt', (e) => {
+      // Prevent the mini-infobar from appearing on mobile
+      e.preventDefault();
+      // Stash the event so it can be triggered later.
+      deferredPrompt = e;
+      // Show the install UI
+      installContainer.classList.remove('hidden');
+    });
+
+    installBtn.addEventListener('click', async () => {
+      if (!deferredPrompt) return;
+      
+      deferredPrompt.prompt();
+      
+      const { outcome } = await deferredPrompt.userChoice;
+      console.log(`User response to the install prompt: ${outcome}`);
+      
+      deferredPrompt = null;
+      installContainer.classList.add('hidden');
+    });
+
+    // --- Helper Functions ---
     function formatPeso(value) {
       const num = Number(value) || 0;
       const abs = Math.abs(num).toLocaleString("en-PH", {
         maximumFractionDigits: 2
       });
-      if (num < 0) return "-₱" + abs;
-      return "₱" + abs;
+      return num < 0 ? "-₱" + abs : "₱" + abs;
     }
 
     function setLoading(text) {
@@ -505,54 +538,10 @@
     function showToast(message) {
       toast.textContent = message;
       toast.classList.add("show");
-
       if (toastTimeoutId) clearTimeout(toastTimeoutId);
       toastTimeoutId = setTimeout(() => {
         toast.classList.remove("show");
       }, 2500);
-    }
-
-    function updateSettingsUI() {
-      weeklyExpenseInput.value =
-        settings.weeklyExpense != null ? settings.weeklyExpense : "";
-      goalAmountInput.value =
-        settings.goalAmount != null ? settings.goalAmount : "";
-    }
-
-    function renderHistory(entries) {
-      historyDiv.innerHTML = "";
-      if (!entries.length) {
-        historyDiv.innerHTML =
-          "<small>No entries yet. Add your first savings or deduction above.</small>";
-        return;
-      }
-
-      entries.forEach((item) => {
-        const div = document.createElement("div");
-        div.className = "history-item";
-
-        const amountClass =
-          item.amount >= 0 ? "amount-positive" : "amount-negative";
-
-        const left = document.createElement("div");
-        left.innerHTML = `
-          <strong class="${amountClass}">${formatPeso(item.amount)}</strong>
-          <br/>
-          <small>${item.note || ""}</small>
-        `;
-
-        const right = document.createElement("div");
-        let dateText = "";
-        if (item.createdAt && item.createdAt.toDate) {
-          const date = item.createdAt.toDate();
-          dateText = date.toLocaleDateString();
-        }
-        right.innerHTML = `<small>${dateText}</small>`;
-
-        div.appendChild(left);
-        div.appendChild(right);
-        historyDiv.appendChild(div);
-      });
     }
 
     function updateStats(entries) {
@@ -561,176 +550,145 @@
 
       let weeksOfRunway = 0;
       if (settings.weeklyExpense > 0 && totalSaved > 0) {
-        weeksOfRunway = Math.floor(totalSaved / settings.weeklyExpense);
+        weeksOfRunway = (totalSaved / settings.weeklyExpense).toFixed(1);
       }
-      weeksDisplay.textContent = weeksOfRunway;
+      weeksDisplay.textContent = weeksOfRunway + " wks";
 
       if (settings.goalAmount && settings.goalAmount > 0) {
         goalDisplay.textContent = formatPeso(settings.goalAmount);
         const progressRaw = (totalSaved / settings.goalAmount) * 100;
         const clamped = Math.min(100, Math.max(0, progressRaw));
-        progressDisplay.textContent = clamped.toFixed(1) + "%";
+        progressDisplay.textContent = clamped.toFixed(0) + "%";
       } else {
         goalDisplay.textContent = "Not set";
         progressDisplay.textContent = "–";
       }
     }
 
-    function settingsDocRef(uid) {
-      return doc(db, "users", uid, "meta", "settings");
+    function renderHistory(entries) {
+      historyDiv.innerHTML = "";
+      if (!entries.length) {
+        historyDiv.innerHTML = "<small>No entries yet.</small>";
+        return;
+      }
+      entries.forEach((item) => {
+        const div = document.createElement("div");
+        div.className = "history-item";
+        const amountClass = item.amount >= 0 ? "amount-positive" : "amount-negative";
+        
+        let dateText = "";
+        if (item.createdAt && item.createdAt.toDate) {
+          dateText = item.createdAt.toDate().toLocaleDateString(undefined, {
+            month: 'short', day: 'numeric'
+          });
+        }
+
+        div.innerHTML = `
+          <div>
+            <strong class="${amountClass}">${formatPeso(item.amount)}</strong>
+            <br/><small>${item.note || "Savings"}</small>
+          </div>
+          <div><small>${dateText}</small></div>
+        `;
+        historyDiv.appendChild(div);
+      });
     }
 
-    function savingsCollectionRef(uid) {
-      return collection(db, "users", uid, "savingsEntries");
-    }
-
+    // --- Firebase Operations ---
     async function loadSettings(uid) {
-      const ref = settingsDocRef(uid);
+      const ref = doc(db, "users", uid, "meta", "settings");
       const snap = await getDoc(ref);
       settings = snap.exists() ? snap.data() : { weeklyExpense: 0, goalAmount: 0 };
-      updateSettingsUI();
+      weeklyExpenseInput.value = settings.weeklyExpense || "";
+      goalAmountInput.value = settings.goalAmount || "";
     }
 
     function subscribeToEntries(uid) {
       if (unsubscribeEntries) unsubscribeEntries();
-
       const q = query(
-        savingsCollectionRef(uid),
+        collection(db, "users", uid, "savingsEntries"),
         orderBy("createdAt", "desc"),
-        limit(50)
+        limit(30)
       );
-
-      unsubscribeEntries = onSnapshot(
-        q,
-        (snapshot) => {
-          const entries = snapshot.docs.map((doc) => ({
-            id: doc.id,
-            ...doc.data()
-          }));
-          currentEntries = entries;
-          renderHistory(entries);
-          updateStats(entries);
-          setLoading(null);
-        },
-        (error) => {
-          console.error("Error listening to entries:", error);
-          setLoading("Error loading data.");
-          showToast("Error loading data from PesoSave.");
-        }
-      );
-    }
-
-    function openSettingsModal() {
-      settingsModal.classList.remove("hidden");
-      requestAnimationFrame(() => {
-        settingsModal.classList.add("open");
+      unsubscribeEntries = onSnapshot(q, (snapshot) => {
+        const entries = snapshot.docs.map((doc) => ({
+          id: doc.id, ...doc.data()
+        }));
+        renderHistory(entries);
+        updateStats(entries);
+        setLoading(null);
+      }, (error) => {
+        console.error(error);
+        showToast("Error syncing data");
       });
     }
 
-    function closeSettingsModal() {
+    // --- Event Listeners ---
+    toggleSettingsBtn.onclick = () => {
+      settingsModal.classList.remove("hidden");
+      requestAnimationFrame(() => settingsModal.classList.add("open"));
+    };
+
+    closeSettingsBtn.onclick = () => {
       settingsModal.classList.remove("open");
-      setTimeout(() => {
-        settingsModal.classList.add("hidden");
-      }, 350);
-    }
+      setTimeout(() => settingsModal.classList.add("hidden"), 350);
+    };
 
-    toggleSettingsBtn.addEventListener("click", openSettingsModal);
-    closeSettingsBtn.addEventListener("click", closeSettingsModal);
-    settingsModal.addEventListener("click", (e) => {
-      if (e.target === settingsModal) closeSettingsModal();
-    });
-
-    saveSettingsBtn.addEventListener("click", async () => {
-      if (!currentUser) {
-        showToast("Please wait, connecting to PesoSave…");
-        return;
-      }
-
+    saveSettingsBtn.onclick = async () => {
+      if (!currentUser) return;
       const weeklyExpense = Number(weeklyExpenseInput.value) || 0;
       const goalAmount = Number(goalAmountInput.value) || 0;
-
       settings.weeklyExpense = weeklyExpense;
       settings.goalAmount = goalAmount;
-
+      
       try {
-        await setDoc(
-          settingsDocRef(currentUser.uid),
-          { weeklyExpense, goalAmount, updatedAt: serverTimestamp() },
-          { merge: true }
-        );
-        showToast("Settings saved ✅");
-        updateStats(currentEntries);
-        closeSettingsModal();
-      } catch (err) {
-        console.error(err);
-        showToast("Failed to save settings. Please try again.");
-      }
-    });
+        await setDoc(doc(db, "users", currentUser.uid, "meta", "settings"), 
+          { weeklyExpense, goalAmount, updatedAt: serverTimestamp() }, 
+          { merge: true });
+        showToast("Settings saved");
+        closeSettingsBtn.click();
+        location.reload(); 
+      } catch (e) { showToast("Error saving"); }
+    };
 
-    addSavingBtn.addEventListener("click", async () => {
-      if (!currentUser) {
-        showToast("Please wait, connecting to PesoSave…");
-        return;
-      }
-
+    addSavingBtn.onclick = async () => {
+      if (!currentUser) return;
       const amount = Number(amountInput.value);
-      if (!amount || amount === 0) {
-        showToast("Please enter a non-zero amount (positive or negative).");
-        return;
-      }
-
+      if (!amount) return showToast("Enter an amount");
       const note = noteInput.value.trim();
 
       try {
-        await addDoc(savingsCollectionRef(currentUser.uid), {
-          amount,
-          note,
-          createdAt: serverTimestamp()
+        await addDoc(collection(db, "users", currentUser.uid, "savingsEntries"), {
+          amount, note, createdAt: serverTimestamp()
         });
         amountInput.value = "";
         noteInput.value = "";
-        showToast("Entry added ✅");
-      } catch (err) {
-        console.error(err);
-        showToast("Failed to add entry. Please try again.");
-      }
-    });
+        showToast("Saved!");
+      } catch (e) { showToast("Error adding"); }
+    };
 
-    setLoading("Connecting to PesoSave…");
-
+    // --- Init ---
     onAuthStateChanged(auth, async (user) => {
       if (user) {
         currentUser = user;
-        setLoading("Loading your data…");
-        try {
-          await loadSettings(user.uid);
-          subscribeToEntries(user.uid);
-        } catch (err) {
-          console.error(err);
-          setLoading("Error loading your data.");
-          showToast("Error loading your PesoSave data.");
-        }
+        setLoading("Loading...");
+        await loadSettings(user.uid);
+        subscribeToEntries(user.uid);
       } else {
-        try {
-          await signInAnonymously(auth);
-        } catch (err) {
-          console.error("Anonymous sign-in failed:", err);
-          setLoading("Failed to connect to PesoSave.");
-          showToast("Failed to connect to PesoSave.");
-        }
+        signInAnonymously(auth).catch(e => showToast("Auth failed"));
       }
     });
   </script>
 
-  <!-- Service Worker registration -->
   <script>
     if ("serviceWorker" in navigator) {
       window.addEventListener("load", () => {
-        navigator.serviceWorker
-          .register("/sw.js")
-          .catch((err) => {
-            console.log("Service worker registration failed:", err);
-          });
+        // Prevent registration in blob/data URLs to avoid "protocol not supported" errors
+        if (window.location.protocol.startsWith("http")) {
+          navigator.serviceWorker.register("sw.js").catch(console.error);
+        } else {
+          console.log("Service Workers not supported in this preview environment.");
+        }
       });
     }
   </script>
