@@ -2,19 +2,20 @@
   "name": "PesoSave – Savings Weeks Tracker",
   "short_name": "PesoSave",
   "description": "Track your peso savings and see how many weeks of expenses your emergency fund can cover.",
-  "start_url": "/",
-  "scope": "/",
+  "start_url": "./index.html",
+  "scope": "./",
   "display": "standalone",
   "background_color": "#f3f4f6",
   "theme_color": "#2563eb",
+  "orientation": "portrait",
   "icons": [
     {
-      "src": "/favicon.png",
+      "src": "favicon.png",
       "sizes": "192x192",
       "type": "image/png"
     },
     {
-      "src": "/favicon.png",
+      "src": "favicon.png",
       "sizes": "512x512",
       "type": "image/png"
     }
