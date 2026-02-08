@@ -5,8 +5,14 @@
   <title>PesoSave – Savings Weeks Tracker</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
+  <!-- Theme color for browser UI -->
+  <meta name="theme-color" content="#2563eb" />
+
   <!-- Favicon: use favicon.png from the root folder -->
   <link rel="icon" type="image/png" href="/favicon.png" />
+
+  <!-- PWA Manifest -->
+  <link rel="manifest" href="/manifest.webmanifest" />
 
   <style>
     :root {
@@ -105,8 +111,8 @@
       width: auto;
       background: transparent;
       color: var(--primary);
-      border: none;                 /* no border/shadow */
-      padding: 0.25rem;             /* minimal padding, keeps hit area */
+      border: none;
+      padding: 0.25rem;
       font-size: 0.85rem;
       border-radius: 999px;
       display: inline-flex;
@@ -230,7 +236,7 @@
       box-shadow: 0 10px 25px rgba(0, 0, 0, 0.25);
       transform: translateY(10px) scale(0.97);
       opacity: 0;
-      border: none; /* no visible border for settings container */
+      border: none;
       transition:
         transform 0.35s ease,
         opacity 0.35s ease;
@@ -458,7 +464,7 @@
     };
     let unsubscribeEntries = null;
     let toastTimeoutId = null;
-    let currentEntries = []; // keep last entries for re-computing stats on settings change
+    let currentEntries = [];
 
     // --- DOM elements ---
     const weeklyExpenseInput = document.getElementById("weeklyExpense");
@@ -613,7 +619,7 @@
             id: doc.id,
             ...doc.data()
           }));
-          currentEntries = entries;              // keep reference
+          currentEntries = entries;
           renderHistory(entries);
           updateStats(entries);
           setLoading(null);
@@ -638,7 +644,7 @@
       settingsModal.classList.remove("open");
       setTimeout(() => {
         settingsModal.classList.add("hidden");
-      }, 350); // match CSS transition
+      }, 350);
     }
 
     toggleSettingsBtn.addEventListener("click", () => {
@@ -679,7 +685,7 @@
           { merge: true }
         );
         showToast("Settings saved ✅");
-        updateStats(currentEntries);       // recompute Goal/Progress immediately
+        updateStats(currentEntries); // recompute Goal/Progress immediately
         closeSettingsModal();
       } catch (err) {
         console.error(err);
@@ -742,6 +748,19 @@
         }
       }
     });
+  </script>
+
+  <!-- Service Worker registration -->
+  <script>
+    if ("serviceWorker" in navigator) {
+      window.addEventListener("load", () => {
+        navigator.serviceWorker
+          .register("/sw.js")
+          .catch((err) => {
+            console.log("Service worker registration failed:", err);
+          });
+      });
+    }
   </script>
 </body>
 </html>
