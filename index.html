@@ -5,11 +5,12 @@
   <title>PesoSave – Savings Weeks Tracker</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-  <!-- Theme color for browser UI -->
+  <!-- Theme color for browser UI / status bar -->
   <meta name="theme-color" content="#2563eb" />
 
-  <!-- Favicon: use favicon.png from the root folder -->
+  <!-- Favicon & PWA icons (make sure favicon.png exists in root and is at least 192x192) -->
   <link rel="icon" type="image/png" href="/favicon.png" />
+  <link rel="apple-touch-icon" href="/favicon.png" />
 
   <!-- PWA Manifest -->
   <link rel="manifest" href="/manifest.webmanifest" />
@@ -456,17 +457,12 @@
     const auth = getAuth(app);
     const db = getFirestore(app);
 
-    // --- State ---
     let currentUser = null;
-    let settings = {
-      weeklyExpense: 0,
-      goalAmount: 0
-    };
+    let settings = { weeklyExpense: 0, goalAmount: 0 };
     let unsubscribeEntries = null;
     let toastTimeoutId = null;
     let currentEntries = [];
 
-    // --- DOM elements ---
     const weeklyExpenseInput = document.getElementById("weeklyExpense");
     const goalAmountInput = document.getElementById("goalAmount");
     const saveSettingsBtn = document.getElementById("saveSettingsBtn");
@@ -488,7 +484,6 @@
     const loadingBanner = document.getElementById("loadingBanner");
     const toast = document.getElementById("toast");
 
-    // --- Helpers ---
     function formatPeso(value) {
       const num = Number(value) || 0;
       const abs = Math.abs(num).toLocaleString("en-PH", {
@@ -511,9 +506,7 @@
       toast.textContent = message;
       toast.classList.add("show");
 
-      if (toastTimeoutId) {
-        clearTimeout(toastTimeoutId);
-      }
+      if (toastTimeoutId) clearTimeout(toastTimeoutId);
       toastTimeoutId = setTimeout(() => {
         toast.classList.remove("show");
       }, 2500);
@@ -583,7 +576,6 @@
       }
     }
 
-    // --- Firestore: paths ---
     function settingsDocRef(uid) {
       return doc(db, "users", uid, "meta", "settings");
     }
@@ -595,11 +587,7 @@
     async function loadSettings(uid) {
       const ref = settingsDocRef(uid);
       const snap = await getDoc(ref);
-      if (snap.exists()) {
-        settings = snap.data();
-      } else {
-        settings = { weeklyExpense: 0, goalAmount: 0 };
-      }
+      settings = snap.exists() ? snap.data() : { weeklyExpense: 0, goalAmount: 0 };
       updateSettingsUI();
     }
 
@@ -632,7 +620,6 @@
       );
     }
 
-    // --- Modal controls ---
     function openSettingsModal() {
       settingsModal.classList.remove("hidden");
       requestAnimationFrame(() => {
@@ -647,21 +634,12 @@
       }, 350);
     }
 
-    toggleSettingsBtn.addEventListener("click", () => {
-      openSettingsModal();
-    });
-
-    closeSettingsBtn.addEventListener("click", () => {
-      closeSettingsModal();
-    });
-
+    toggleSettingsBtn.addEventListener("click", openSettingsModal);
+    closeSettingsBtn.addEventListener("click", closeSettingsModal);
     settingsModal.addEventListener("click", (e) => {
-      if (e.target === settingsModal) {
-        closeSettingsModal();
-      }
+      if (e.target === settingsModal) closeSettingsModal();
     });
 
-    // --- Save settings (updates dashboard in real time) ---
     saveSettingsBtn.addEventListener("click", async () => {
       if (!currentUser) {
         showToast("Please wait, connecting to PesoSave…");
@@ -677,15 +655,11 @@
       try {
         await setDoc(
           settingsDocRef(currentUser.uid),
-          {
-            weeklyExpense,
-            goalAmount,
-            updatedAt: serverTimestamp()
-          },
+          { weeklyExpense, goalAmount, updatedAt: serverTimestamp() },
           { merge: true }
         );
         showToast("Settings saved ✅");
-        updateStats(currentEntries); // recompute Goal/Progress immediately
+        updateStats(currentEntries); // update goal/progress immediately
         closeSettingsModal();
       } catch (err) {
         console.error(err);
@@ -693,7 +667,6 @@
       }
     });
 
-    // --- Add savings entry ---
     addSavingBtn.addEventListener("click", async () => {
       if (!currentUser) {
         showToast("Please wait, connecting to PesoSave…");
@@ -723,7 +696,6 @@
       }
     });
 
-    // --- Auth init ---
     setLoading("Connecting to PesoSave…");
 
     onAuthStateChanged(auth, async (user) => {
@@ -750,7 +722,7 @@
     });
   </script>
 
-  <!-- Service Worker registration -->
+  <!-- Service Worker registration (non-module script) -->
   <script>
     if ("serviceWorker" in navigator) {
       window.addEventListener("load", () => {
