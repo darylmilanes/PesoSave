@@ -8,8 +8,8 @@
   <!-- Theme color for browser UI / status bar -->
   <meta name="theme-color" content="#2563eb" />
 
-  <!-- Favicon & PWA icons (make sure favicon.png exists in root and is at least 192x192) -->
-  <link rel="icon" type="image/png" href="/favicon.png" />
+  <!-- Favicon & app icons (uses favicon.png for everything) -->
+  <link rel="icon" type="image/png" sizes="192x192" href="/favicon.png" />
   <link rel="apple-touch-icon" href="/favicon.png" />
 
   <!-- PWA Manifest -->
@@ -659,7 +659,7 @@
           { merge: true }
         );
         showToast("Settings saved ✅");
-        updateStats(currentEntries); // update goal/progress immediately
+        updateStats(currentEntries);
         closeSettingsModal();
       } catch (err) {
         console.error(err);
@@ -722,7 +722,7 @@
     });
   </script>
 
-  <!-- Service Worker registration (non-module script) -->
+  <!-- Service Worker registration -->
   <script>
     if ("serviceWorker" in navigator) {
       window.addEventListener("load", () => {
