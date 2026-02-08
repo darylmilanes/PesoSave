@@ -1,12 +1,11 @@
-// sw.js
+const CACHE_NAME = "pesosave-cache-v2";
 
-const CACHE_NAME = "pesosave-cache-v1";
-
+// Use relative paths
 const APP_SHELL = [
-  "/",
-  "/index.html",
-  "/favicon.png",
-  "/manifest.webmanifest"
+  "./",
+  "index.html",
+  "favicon.png",
+  "manifest.webmanifest"
 ];
 
 self.addEventListener("install", (event) => {
@@ -31,7 +30,14 @@ self.addEventListener("activate", (event) => {
 
 self.addEventListener("fetch", (event) => {
   const { request } = event;
-  if (request.method !== "GET") return;
+  // Only cache GET requests and ignore Firebase/Google APIs
+  if (
+    request.method !== "GET" || 
+    request.url.includes("firestore.googleapis.com") || 
+    request.url.includes("firebase")
+  ) {
+    return;
+  }
 
   event.respondWith(
     caches.match(request).then((cachedResponse) => {
@@ -39,10 +45,11 @@ self.addEventListener("fetch", (event) => {
 
       return fetch(request)
         .then((networkResponse) => {
+          // Check if valid response and from our origin
           if (
             networkResponse &&
             networkResponse.status === 200 &&
-            request.url.startsWith(self.location.origin)
+            networkResponse.type === "basic"
           ) {
             const clone = networkResponse.clone();
             caches.open(CACHE_NAME).then((cache) => {
@@ -51,15 +58,7 @@ self.addEventListener("fetch", (event) => {
           }
           return networkResponse;
         })
-        .catch(() =>
-          new Response(
-            "You appear to be offline. PesoSave may not be fully functional.",
-            {
-              status: 503,
-              statusText: "Service Unavailable"
-            }
-          )
-        );
+        .catch(() => console.log("Offline and not cached"));
     })
   );
 });
